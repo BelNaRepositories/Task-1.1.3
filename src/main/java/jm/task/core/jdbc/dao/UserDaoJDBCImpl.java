@@ -7,12 +7,12 @@ import jm.task.core.jdbc.util.Util;
 import java.sql.*;
 
 public class UserDaoJDBCImpl implements UserDao {
-//    private PreparedStatement preparedStatement = null;
+// private PreparedStatement preparedStatement = null;
     public UserDaoJDBCImpl() {
     }
     Connection conn = Util.getConnection();
-    public void createUsersTable() {
 
+    public void createUsersTable() {
         try (Statement state = conn.createStatement()) {
             if (!conn.isClosed()){
                 System.out.println("Всё хорошо");
@@ -22,7 +22,8 @@ public class UserDaoJDBCImpl implements UserDao {
             state.executeUpdate("CREATE TABLE IF NOT EXISTS users " +
                     "(id MEDIUMINT not null auto_increment," + " name VARCHAR(36), " + "lastname VARCHAR(36), " +
                     "age TINYINT, " + "PRIMARY KEY (id))");
-        } catch (SQLException | NullPointerException e) {
+            conn.commit();
+            } catch (SQLException | NullPointerException e) {
             e.printStackTrace();
         }
     }
@@ -35,6 +36,8 @@ public class UserDaoJDBCImpl implements UserDao {
                 System.out.println("Не все хорошо");
             }
             state.executeUpdate("DROP TABLE IF EXISTS users");
+            conn.setAutoCommit(false);
+            conn.commit();
         } catch (SQLException | NullPointerException e) {
             e.printStackTrace();
         }
@@ -52,9 +55,10 @@ public class UserDaoJDBCImpl implements UserDao {
             prepa.setByte(3, age);
             prepa.executeUpdate();
             System.out.println("User с именем – " + name + " добавлен в базу данных");
+            conn.commit();
         } catch (SQLException | NullPointerException e) {
             e.printStackTrace();
-        }
+          }
     }
 
     public void removeUserById(long id) {
@@ -65,6 +69,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 System.out.println("Не все хорошо");
             }
             state.executeUpdate("DELETE FROM test.users where id");
+            conn.commit();
         } catch (SQLException | NullPointerException e) {
             e.printStackTrace();
         }
@@ -86,6 +91,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setLastName(rs.getString("lastName"));
                 user.setAge(rs.getByte("age"));
                 users.add(user);
+                conn.commit();
             }
         } catch (SQLException | NullPointerException e) {
                 e.printStackTrace();
@@ -101,6 +107,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 System.out.println("Не все хорошо");
             }
             state.executeUpdate("DELETE FROM users");
+            conn.commit();
         } catch (SQLException | NullPointerException e) {
             e.printStackTrace();
         }
